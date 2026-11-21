@@ -18,7 +18,7 @@ import { debugLog, errorLog, warnLog } from './logger';
  * не требует Node.js и не тянет в бандл криптомодуль.
  */
 export async function sha256Hex(data: ArrayBuffer): Promise<string> {
-	const subtle = globalThis.crypto?.subtle;
+	const subtle = window.crypto?.subtle;
 	if (!subtle || typeof subtle.digest !== 'function') {
 		throw new Error(
 			t(
@@ -49,11 +49,6 @@ function copyMetadata(metadata: FileMetadata): FileMetadata {
  */
 function createFileMap(): Record<string, FileMetadata> {
 	return Object.create(null) as Record<string, FileMetadata>;
-}
-
-function isFileLike(file: TAbstractFile): file is TFile {
-	const candidate = file as TFile;
-	return typeof candidate.basename === 'string' && typeof candidate.extension === 'string';
 }
 
 function normalizeFileMetadata(key: string, value: unknown): FileMetadata | null {
@@ -435,7 +430,7 @@ export class ManifestManager {
 	}
 
 	handleCreate(file: TAbstractFile): Promise<void> {
-		if (!isFileLike(file)) {
+		if (!(file instanceof TFile)) {
 			return Promise.resolve();
 		}
 		this.scheduleRefresh(normalizeVaultPath(file.path));
@@ -443,7 +438,7 @@ export class ManifestManager {
 	}
 
 	handleModify(file: TAbstractFile): Promise<void> {
-		if (!isFileLike(file)) {
+		if (!(file instanceof TFile)) {
 			return Promise.resolve();
 		}
 		this.scheduleRefresh(normalizeVaultPath(file.path));
@@ -456,7 +451,7 @@ export class ManifestManager {
 			if (!path) {
 				return;
 			}
-			if (isFileLike(file)) {
+			if (file instanceof TFile) {
 				this.tombstonePathInternal(path);
 			} else {
 				this.tombstoneFolderInternal(path);
@@ -469,7 +464,7 @@ export class ManifestManager {
 		return this.runExclusive(async () => {
 			const previous = normalizeVaultPath(oldPath);
 			if (previous) {
-				if (isFileLike(file)) {
+				if (file instanceof TFile) {
 					this.tombstonePathInternal(previous);
 				} else {
 					this.tombstoneFolderInternal(previous);
@@ -477,7 +472,7 @@ export class ManifestManager {
 			}
 			const next = normalizeVaultPath(file.path);
 			if (next && !this.isIgnored(next)) {
-				if (isFileLike(file)) {
+				if (file instanceof TFile) {
 					await this.refreshPathInternal(next);
 				} else {
 					await this.refreshPrefix(next);
@@ -625,7 +620,7 @@ export class ManifestManager {
 			);
 		}
 		try {
-			await vault.delete(file);
+			await this.host.app.fileManager.trashFile(file);
 		} catch (error) {
 			if (vault.getAbstractFileByPath(normalized)) {
 				throw new Error(

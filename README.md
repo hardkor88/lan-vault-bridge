@@ -47,7 +47,7 @@ It is plugin data, not a note, and is never indexed by Obsidian.
 
 ## Requirements
 
-- Obsidian 1.5.0 or newer.
+- Obsidian 1.13.0 or newer.
 - Desktop and phone on the same LAN, or connected through a VPN such as Tailscale
   or ZeroTier.
 - Windows, macOS or Linux for the server side.
@@ -115,7 +115,8 @@ The connection string looks like:
     or changed after deletion.
   - **Content changes** — active on both sides but with different SHA-256.
 - Per-file actions: send to desktop, download to phone, restore, delete everywhere,
-  accept the desktop version, or skip.
+  accept the desktop version, or skip. “Delete everywhere” respects the Obsidian
+  trash preference (`FileManager.trashFile`) and records tombstones on both sides.
 - Bulk actions:
   - **Apply defaults to all** — preserves data: new files are copied, deleted files
     are offered for restore, newer versions win.
@@ -199,7 +200,7 @@ For every release:
 
 1. Run `npm run build`.
 2. Create a GitHub Release whose tag exactly matches `manifest.json` version
-   (for example `1.0.1`, without a `v` prefix).
+   (for example `1.0.2`, without a `v` prefix).
 3. Attach `main.js`, `manifest.json` and `styles.css` as release assets.
 4. Publish the release — it must not stay a draft or pre-release.
 

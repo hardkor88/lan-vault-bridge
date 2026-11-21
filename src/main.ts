@@ -485,7 +485,7 @@ export default class LanSyncPlugin extends Plugin implements SyncHost {
 		this.registerEvent(
 			vault.on('delete', (file) => {
 				void this.manager.handleDelete(file).catch((error: unknown) => {
-					errorLog('vault.delete failed.', error);
+					errorLog('vault delete event failed.', error);
 				});
 			}),
 		);

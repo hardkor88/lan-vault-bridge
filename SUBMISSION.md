@@ -11,7 +11,7 @@ and push the contents of this folder:
 ```bash
 git init
 git add .
-git commit -m "Release 1.0.1"
+git commit -m "Release 1.0.2"
 git branch -M main
 git remote add origin https://github.com/hardkor88/lan-vault-bridge.git
 git push -u origin main
@@ -28,17 +28,17 @@ attached to the GitHub Release by the workflow.
 
 ## 2. Create the release
 
-The tag must exactly match `version` in `manifest.json` — `1.0.1`, without a `v`
+The tag must exactly match `version` in `manifest.json` — `1.0.2`, without a `v`
 prefix.
 
 ```bash
-git tag 1.0.1
-git push origin 1.0.1
+git tag 1.0.2
+git push origin 1.0.2
 ```
 
-If `1.0.0` is already published, commit the 1.0.1 changes, push them to `main`,
-then create the `1.0.1` tag. The review dashboard will pick up the new release with
-the “Check for new releases” button.
+If `1.0.0` or `1.0.1` is already published, commit the 1.0.2 changes, push them to
+`main`, then create the `1.0.2` tag. The review dashboard will pick up the new
+release with the “Check for new releases” button.
 
 The workflow in `.github/workflows/release.yml` runs on the tag, verifies the tag
 against the manifest, builds the plugin and creates a GitHub Release with these
@@ -52,7 +52,7 @@ After the workflow finishes, open the release and confirm that it is **not** a
 draft and **not** a pre-release.
 
 You can also create the release manually: run `npm ci && npm run build`, then
-create a release for tag `1.0.1` and attach the three files above.
+create a release for tag `1.0.2` and attach the three files above.
 
 ## 3. Submit the plugin entry
 
@@ -85,8 +85,8 @@ create a release for tag `1.0.1` and attach the three files above.
 - [ ] `manifest.json` id is unique: `lan-vault-bridge` (checked against the directory).
 - [ ] Name does not contain “Obsidian”: “LAN Vault Bridge”.
 - [ ] Description is 250 characters or fewer, ends with a period and starts with a verb.
-- [ ] `version` is `1.0.1`; release tag is `1.0.1`.
-- [ ] `minAppVersion` is justified: `1.5.0`.
+- [ ] `version` is `1.0.2`; release tag is `1.0.2`.
+- [ ] `minAppVersion` is justified: `1.13.0` (declarative settings).
 - [ ] `author` is a person/nickname, `authorUrl` points to GitHub.
 - [ ] `LICENSE` (MIT) exists in the repository root.
 - [ ] `README.md` has install, usage, privacy, security and limitations sections.
@@ -108,7 +108,7 @@ needs Node.
 ## 6. Automated review recommendations
 
 The review bot may show these as “Recommendation” (not failures). What was done in
-1.0.1:
+1.0.1/1.0.2:
 
 - **Local Storage** — removed. Automatic language detection now uses the
   Obsidian/moment locale and the browser language only.
@@ -117,6 +117,13 @@ The review bot may show these as “Recommendation” (not failures). What was d
 - **Missing artifact attestations** — the workflow now runs
   `actions/attest-build-provenance@v2` for `main.js`, `manifest.json` and
   `styles.css` before creating the release.
+- **Declarative settings / deprecated `display()`** — the settings tab now implements
+  `getSettingDefinitions()`; `display()` is removed and `minAppVersion` is `1.13.0`.
+- **`Vault.delete()`** — replaced with `FileManager.trashFile()` to respect the
+  user's deletion preference.
+- **`TFile` casts / `globalThis` / direct styles / `execCommand`** — removed or
+  replaced with `instanceof TFile`, `window`, CSS classes and `navigator.clipboard`.
+- **`setWarning()`** — replaced with `setDestructive()`.
 - **Vault Enumeration** — inherent to a sync plugin. The manifest needs a complete
   list of vault paths; the list is sent only to the paired desktop, never to the
   author or a third party.
@@ -131,5 +138,5 @@ does not treat them as hidden behavior.
 The manifest lives in `.obsidian/plugins/lan-vault-bridge/sync-manifest.json`. It is
 plugin data outside the vault index, so the plugin uses `vault.adapter` for that one
 file (the same mechanism `saveData` uses). All user notes and attachments are read,
-created, modified and deleted through the Vault API (`readBinary`, `createBinary`,
-`modifyBinary`, `delete`).
+created and modified through the Vault API, and removed through
+`FileManager.trashFile()` so the user's deletion preference is respected.

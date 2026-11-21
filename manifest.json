@@ -1,8 +1,8 @@
 {
   "id": "lan-vault-bridge",
   "name": "LAN Vault Bridge",
-  "version": "1.0.1",
-  "minAppVersion": "1.5.0",
+  "version": "1.0.2",
+  "minAppVersion": "1.13.0",
   "description": "Sync your vault bidirectionally over the local network with tombstone protection and conflict resolution.",
   "author": "hardkor88",
   "authorUrl": "https://github.com/hardkor88",

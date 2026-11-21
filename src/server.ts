@@ -688,7 +688,7 @@ export class DesktopSyncServer {
 					result.set(chunk, offset);
 					offset += chunk.byteLength;
 				}
-				resolve(result.buffer as ArrayBuffer);
+				resolve(result.buffer);
 			});
 			request.on('error', (error) => {
 				fail(error);
