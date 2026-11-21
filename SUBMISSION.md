@@ -1,0 +1,110 @@
+# Submitting LAN Vault Bridge to the Obsidian community directory
+
+This file is a checklist for the repository owner. It is intentionally not part of
+the plugin bundle.
+
+## 1. Publish the repository
+
+Create a **public** repository at `https://github.com/hardkor88/lan-vault-bridge`
+and push the contents of this folder:
+
+```bash
+git init
+git add .
+git commit -m "Initial release 1.0.0"
+git branch -M main
+git remote add origin https://github.com/hardkor88/lan-vault-bridge.git
+git push -u origin main
+```
+
+The repository root must contain:
+
+- `manifest.json`
+- `README.md`
+- `LICENSE`
+
+`main.js` is a build artifact and is intentionally ignored by `.gitignore`; it is
+attached to the GitHub Release by the workflow.
+
+## 2. Create the release
+
+The tag must exactly match `version` in `manifest.json` — `1.0.0`, without a `v`
+prefix.
+
+```bash
+git tag 1.0.0
+git push origin 1.0.0
+```
+
+The workflow in `.github/workflows/release.yml` runs on the tag, verifies the tag
+against the manifest, builds the plugin and creates a GitHub Release with these
+assets:
+
+- `main.js`
+- `manifest.json`
+- `styles.css`
+
+After the workflow finishes, open the release and confirm that it is **not** a
+draft and **not** a pre-release.
+
+You can also create the release manually: run `npm ci && npm run build`, then
+create a release for tag `1.0.0` and attach the three files above.
+
+## 3. Submit the plugin entry
+
+1. Fork [`obsidianmd/obsidian-releases`](https://github.com/obsidianmd/obsidian-releases).
+2. Open `community-plugins.json` and add this object at the end of the array:
+
+```json
+  {
+    "id": "lan-vault-bridge",
+    "name": "LAN Vault Bridge",
+    "author": "hardkor88",
+    "description": "Sync your vault bidirectionally over the local network with tombstone protection and conflict resolution.",
+    "repo": "hardkor88/lan-vault-bridge"
+  }
+```
+
+3. Commit with a message such as `Add plugin: LAN Vault Bridge`.
+4. Open a pull request against `obsidianmd/obsidian-releases:master`.
+5. Fill in the PR template and mention:
+   - the build and typecheck pass; the API, manifest, diff, upload/download and
+     tombstone flows were smoke-tested against a fake vault;
+   - the mobile UI still needs a real-device test before you submit;
+   - `isDesktopOnly: false`; Node modules are loaded lazily only in the desktop branch;
+   - `Vault.adapter` is used only for the plugin manifest, while user files go through
+     the Vault API;
+   - the release assets and tag match `manifest.json`.
+
+## 4. Pre-submission checklist
+
+- [ ] `manifest.json` id is unique: `lan-vault-bridge` (checked against the directory).
+- [ ] Name does not contain “Obsidian”: “LAN Vault Bridge”.
+- [ ] Description is 250 characters or fewer, ends with a period and starts with a verb.
+- [ ] `version` is `1.0.0`; release tag is `1.0.0`.
+- [ ] `minAppVersion` is justified: `1.5.0`.
+- [ ] `author` is a person/nickname, `authorUrl` points to GitHub.
+- [ ] `LICENSE` (MIT) exists in the repository root.
+- [ ] `README.md` has install, usage, privacy, security and limitations sections.
+- [ ] No template code, no `innerHTML`/`outerHTML`/`insertAdjacentHTML`.
+- [ ] No `console.log` in normal operation; diagnostic output is behind “Debug logging”.
+- [ ] Command IDs do not repeat the plugin id (`sync-now`, `ping-server`, ...).
+- [ ] Settings and commands use sentence case; all settings headings use `.setHeading()`.
+- [ ] Mobile: the plugin loads, opens settings and syncs as a client.
+- [ ] Release assets: `main.js`, `manifest.json`, `styles.css`; release is public.
+
+## 5. If the reviewer asks about Node.js
+
+`isDesktopOnly` is `false` because the plugin has a working mobile client. The only
+Node modules are `http` and `os`; they are loaded through `window.require` inside
+`if (Platform.isDesktop)` branches. On mobile those branches are never executed, and
+the client uses Obsidian `requestUrl` only. The desktop server is the only part that
+needs Node.
+
+## 6. If the reviewer asks about `Vault.adapter`
+
+The manifest lives in `.obsidian/plugins/lan-vault-bridge/sync-manifest.json`. It is
+plugin data outside the vault index, so the plugin uses `vault.adapter` for that one
+file (the same mechanism `saveData` uses). All user notes and attachments are read,
+created, modified and deleted through the Vault API (`readBinary`, `createBinary`,
+`modifyBinary`, `delete`).

@@ -1,0 +1,7 @@
+{
+  "id": "lan-vault-bridge",
+  "name": "LAN Vault Bridge",
+  "author": "hardkor88",
+  "description": "Sync your vault bidirectionally over the local network with tombstone protection and conflict resolution.",
+  "repo": "hardkor88/lan-vault-bridge"
+}

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">LAN Vault Bridge architecture</title>
+  <desc>Desktop Obsidian runs the LAN server and stores the manifest; the phone connects over Wi-Fi with requestUrl and a bearer token.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f7fb"/>
+      <stop offset="1" stop-color="#ececf4"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6c5ce7"/>
+    </marker>
+  </defs>
+  <rect width="960" height="420" fill="url(#bg)"/>
+  <text x="480" y="42" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2333">LAN Vault Bridge — architecture</text>
+  <text x="480" y="68" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#5a6072">Direct LAN connection, no cloud relay</text>
+
+  <!-- Desktop -->
+  <rect x="60" y="105" width="300" height="235" rx="18" fill="#ffffff" stroke="#d8d9e6" stroke-width="1.5"/>
+  <rect x="60" y="105" width="300" height="44" rx="18" fill="#6c5ce7"/>
+  <rect x="60" y="131" width="300" height="18" fill="#6c5ce7"/>
+  <text x="82" y="134" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">Desktop Obsidian</text>
+  <text x="82" y="180" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#1f2333">LAN Vault Bridge · server</text>
+  <text x="82" y="203" font-family="JetBrains Mono, Consolas, monospace" font-size="12" fill="#5a6072">0.0.0.0:27123</text>
+  <text x="82" y="226" font-family="JetBrains Mono, Consolas, monospace" font-size="12" fill="#5a6072">Authorization: Bearer &lt;token&gt;</text>
+  <rect x="82" y="248" width="256" height="34" rx="8" fill="#f2f1ff" stroke="#d8d4ff"/>
+  <text x="94" y="270" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#4b3fd1">sync-manifest.json</text>
+  <text x="82" y="306" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#5a6072">SHA-256 · tombstones · reconcile</text>
+  <text x="82" y="324" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#5a6072">Vault API for notes and attachments</text>
+
+  <!-- Phone -->
+  <rect x="600" y="105" width="300" height="235" rx="18" fill="#ffffff" stroke="#d8d9e6" stroke-width="1.5"/>
+  <rect x="600" y="105" width="300" height="44" rx="18" fill="#00a884"/>
+  <rect x="600" y="131" width="300" height="18" fill="#00a884"/>
+  <text x="622" y="134" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">Phone / tablet Obsidian</text>
+  <text x="622" y="180" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#1f2333">LAN Vault Bridge · client</text>
+  <text x="622" y="203" font-family="JetBrains Mono, Consolas, monospace" font-size="12" fill="#5a6072">requestUrl() · no CORS</text>
+  <text x="622" y="226" font-family="JetBrains Mono, Consolas, monospace" font-size="12" fill="#5a6072">no Node.js · no fetch()</text>
+  <rect x="622" y="248" width="256" height="34" rx="8" fill="#e9fbf4" stroke="#b8ead9"/>
+  <text x="634" y="270" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#067a5c">sync-manifest.json</text>
+  <text x="622" y="306" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#5a6072">QR / JSON pairing</text>
+  <text x="622" y="324" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#5a6072">Interactive conflict review</text>
+
+  <!-- Wi-Fi link -->
+  <rect x="360" y="150" width="240" height="145" rx="16" fill="#ffffff" stroke="#d8d9e6" stroke-width="1.5"/>
+  <text x="480" y="180" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#1f2333">Wi-Fi / LAN / VPN</text>
+  <text x="480" y="204" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#5a6072">GET /api/ping</text>
+  <text x="480" y="222" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#5a6072">POST /api/sync/diff</text>
+  <text x="480" y="240" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#5a6072">GET /api/file</text>
+  <text x="480" y="258" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#5a6072">POST /api/file</text>
+  <text x="480" y="276" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="11" fill="#5a6072">POST /api/file/tombstone</text>
+
+  <line x1="360" y1="222" x2="590" y2="222" stroke="#6c5ce7" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line x1="600" y1="222" x2="370" y2="222" stroke="#6c5ce7" stroke-width="2" opacity="0"/>
+
+  <!-- Bottom notes -->
+  <rect x="60" y="365" width="840" height="34" rx="10" fill="#ffffff" stroke="#d8d9e6"/>
+  <text x="480" y="387" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#5a6072">The phone never imports Node modules. The desktop loads http/os lazily only inside Platform.isDesktop.</text>
+</svg>

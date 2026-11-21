@@ -1,0 +1,41 @@
+{
+  "name": "lan-vault-bridge",
+  "version": "1.0.0",
+  "description": "Sync your Obsidian vault bidirectionally over the local network with tombstone protection and conflict resolution.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "sync",
+    "lan",
+    "local-first",
+    "tombstone"
+  ],
+  "author": "hardkor88",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hardkor88/lan-vault-bridge.git"
+  },
+  "homepage": "https://github.com/hardkor88/lan-vault-bridge#readme",
+  "bugs": {
+    "url": "https://github.com/hardkor88/lan-vault-bridge/issues"
+  },
+  "dependencies": {
+    "diff": "^5.2.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.2.3",
+    "@types/node": "^22.10.2",
+    "@types/qrcode": "^1.5.5",
+    "esbuild": "^0.25.0",
+    "obsidian": "latest",
+    "typescript": "^5.7.3"
+  }
+}
