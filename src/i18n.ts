@@ -14,14 +14,6 @@ export function resolveUiLanguage(setting: UiLanguage): 'en' | 'ru' {
 	} catch {
 		// moment может быть недоступен в тестовой среде.
 	}
-	try {
-		const stored = window.localStorage.getItem('language');
-		if (stored) {
-			candidates.push(stored);
-		}
-	} catch {
-		// localStorage может быть недоступен.
-	}
 	if (typeof navigator !== 'undefined' && navigator.language) {
 		candidates.push(navigator.language);
 	}

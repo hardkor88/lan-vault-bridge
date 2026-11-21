@@ -144,6 +144,12 @@ first release.
   Anyone with access to the vault folder can read it.
 - **Path safety.** The server rejects absolute paths, `..` traversal and everything
   inside `.obsidian` or the excluded folders.
+- **Vault enumeration is local.** The plugin enumerates file paths to build and
+  reconcile the manifest. The manifest is sent only to the paired desktop over the
+  LAN; no file list or content is sent to the author or a third party.
+- **Clipboard is user-initiated.** The clipboard is read only when you press
+  “Paste from clipboard”, and written only when you press a copy button. The plugin
+  never reads or writes the clipboard in the background.
 
 ## Compatibility and limitations
 
@@ -193,7 +199,7 @@ For every release:
 
 1. Run `npm run build`.
 2. Create a GitHub Release whose tag exactly matches `manifest.json` version
-   (for example `1.0.0`, without a `v` prefix).
+   (for example `1.0.1`, without a `v` prefix).
 3. Attach `main.js`, `manifest.json` and `styles.css` as release assets.
 4. Publish the release — it must not stay a draft or pre-release.
 

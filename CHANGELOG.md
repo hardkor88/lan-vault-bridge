@@ -2,6 +2,20 @@
 
 All notable changes to LAN Vault Bridge are documented in this file.
 
+## 1.0.1 — 2026-11-21
+
+### Fixed
+
+- Removed `localStorage` access from automatic language detection; it now uses the
+  Obsidian/moment locale and the browser language only.
+- Removed `!important` from the invalid-input style; the selector now uses normal
+  specificity and a CSS variable.
+- Added GitHub artifact attestations for `main.js`, `manifest.json` and `styles.css`
+  to the release workflow.
+- Documented the two inherent automated-review recommendations: vault enumeration
+  is required for manifest reconciliation, and clipboard access happens only on
+  explicit user action.
+
 ## 1.0.0 — 2026-11-21
 
 ### Added

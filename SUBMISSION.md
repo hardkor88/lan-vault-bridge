@@ -11,7 +11,7 @@ and push the contents of this folder:
 ```bash
 git init
 git add .
-git commit -m "Initial release 1.0.0"
+git commit -m "Release 1.0.1"
 git branch -M main
 git remote add origin https://github.com/hardkor88/lan-vault-bridge.git
 git push -u origin main
@@ -28,13 +28,17 @@ attached to the GitHub Release by the workflow.
 
 ## 2. Create the release
 
-The tag must exactly match `version` in `manifest.json` — `1.0.0`, without a `v`
+The tag must exactly match `version` in `manifest.json` — `1.0.1`, without a `v`
 prefix.
 
 ```bash
-git tag 1.0.0
-git push origin 1.0.0
+git tag 1.0.1
+git push origin 1.0.1
 ```
+
+If `1.0.0` is already published, commit the 1.0.1 changes, push them to `main`,
+then create the `1.0.1` tag. The review dashboard will pick up the new release with
+the “Check for new releases” button.
 
 The workflow in `.github/workflows/release.yml` runs on the tag, verifies the tag
 against the manifest, builds the plugin and creates a GitHub Release with these
@@ -48,7 +52,7 @@ After the workflow finishes, open the release and confirm that it is **not** a
 draft and **not** a pre-release.
 
 You can also create the release manually: run `npm ci && npm run build`, then
-create a release for tag `1.0.0` and attach the three files above.
+create a release for tag `1.0.1` and attach the three files above.
 
 ## 3. Submit the plugin entry
 
@@ -81,7 +85,7 @@ create a release for tag `1.0.0` and attach the three files above.
 - [ ] `manifest.json` id is unique: `lan-vault-bridge` (checked against the directory).
 - [ ] Name does not contain “Obsidian”: “LAN Vault Bridge”.
 - [ ] Description is 250 characters or fewer, ends with a period and starts with a verb.
-- [ ] `version` is `1.0.0`; release tag is `1.0.0`.
+- [ ] `version` is `1.0.1`; release tag is `1.0.1`.
 - [ ] `minAppVersion` is justified: `1.5.0`.
 - [ ] `author` is a person/nickname, `authorUrl` points to GitHub.
 - [ ] `LICENSE` (MIT) exists in the repository root.
@@ -101,7 +105,28 @@ Node modules are `http` and `os`; they are loaded through `window.require` insid
 the client uses Obsidian `requestUrl` only. The desktop server is the only part that
 needs Node.
 
-## 6. If the reviewer asks about `Vault.adapter`
+## 6. Automated review recommendations
+
+The review bot may show these as “Recommendation” (not failures). What was done in
+1.0.1:
+
+- **Local Storage** — removed. Automatic language detection now uses the
+  Obsidian/moment locale and the browser language only.
+- **CSS `!important`** — removed; the invalid-input rule now uses normal selector
+  specificity and `var(--text-error)`.
+- **Missing artifact attestations** — the workflow now runs
+  `actions/attest-build-provenance@v2` for `main.js`, `manifest.json` and
+  `styles.css` before creating the release.
+- **Vault Enumeration** — inherent to a sync plugin. The manifest needs a complete
+  list of vault paths; the list is sent only to the paired desktop, never to the
+  author or a third party.
+- **Clipboard Access** — only on explicit user action: paste import, copy token,
+  copy connection string. No background reads or writes.
+
+These last two are expected for this plugin; mention them in the PR so the reviewer
+does not treat them as hidden behavior.
+
+## 7. If the reviewer asks about `Vault.adapter`
 
 The manifest lives in `.obsidian/plugins/lan-vault-bridge/sync-manifest.json`. It is
 plugin data outside the vault index, so the plugin uses `vault.adapter` for that one

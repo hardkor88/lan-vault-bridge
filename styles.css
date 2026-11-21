@@ -463,8 +463,10 @@
 	font-size: var(--font-ui-smaller);
 }
 
-.lan-sync-settings .is-invalid {
-	border-color: var(--text-error) !important;
+.lan-sync-settings input.is-invalid,
+.lan-sync-settings textarea.is-invalid {
+	border-color: var(--text-error);
+	box-shadow: 0 0 0 1px var(--text-error);
 }
 
 /* ---------- Мобильная раскладка ---------- */

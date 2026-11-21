@@ -1,6 +1,6 @@
 {
   "name": "lan-vault-bridge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sync your Obsidian vault bidirectionally over the local network with tombstone protection and conflict resolution.",
   "main": "main.js",
   "scripts": {
