@@ -13,6 +13,7 @@ import {
 	isTextPath,
 } from '../utils';
 import { confirmAction } from './ConfirmModal';
+import { confirmDeletionWithPreview, type DeleteDecision } from './DeletePreviewModal';
 import { t } from '../i18n';
 
 /** Больше этого не показываем в <pre> и не диффим — чтобы не вешать мобильный WebView. */
@@ -159,10 +160,34 @@ export class SyncReviewModal extends Modal {
 			),
 		});
 
+		this.renderTwoWayToolbar();
 		this.renderConflictSection();
 		this.renderContentSection();
 		this.renderFooter();
 		this.updateCounter();
+	}
+
+	private renderTwoWayToolbar(): void {
+		const toolbar = this.contentEl.createDiv({ cls: 'lan-sync-two-way' });
+		const button = toolbar.createEl('button', {
+			cls: 'lan-sync-two-way-button mod-cta',
+		});
+		const icon = button.createSpan({ cls: 'lan-sync-two-way-icon' });
+		setIcon(icon, 'arrow-left-right');
+		button.createSpan({ text: t('Send to both devices', 'Отправить на оба устройства') });
+		button.addEventListener('click', () => {
+			if (this.closed || this.bulkRunning) {
+				return;
+			}
+			void this.applyTwoWay();
+		});
+		toolbar.createDiv({
+			cls: 'lan-sync-hint',
+			text: t(
+				'Phone → desktop and desktop → phone at the same time. Deletions are confirmed with a content preview; identical files use the newer version.',
+				'Телефон → ПК и ПК → телефон одновременно. Удаления подтверждаются с показом содержимого; для одинаковых файлов побеждает более новая версия.',
+			),
+		});
 	}
 
 	override onClose(): void {
@@ -427,7 +452,7 @@ export class SyncReviewModal extends Modal {
 			text: label,
 		});
 		button.addEventListener('click', () => {
-			if (view.busy || view.status !== 'pending') {
+			if (this.bulkRunning || view.busy || view.status !== 'pending') {
 				return;
 			}
 			handler();
@@ -824,6 +849,113 @@ export class SyncReviewModal extends Modal {
 		this.finishAction(view, 'skipped', t('Skipped without changes', 'Пропущено без изменений'));
 	}
 
+	private async applyTwoWay(): Promise<void> {
+		if (this.bulkRunning || this.closed) {
+			return;
+		}
+		const plan: Deal[] = [];
+		const deletionCandidates: ConflictView[] = [];
+
+		for (const view of this.conflictViews) {
+			if (view.status !== 'pending') {
+				continue;
+			}
+			const conflict = view.conflict;
+			switch (conflict.reason) {
+				case 'only_on_client':
+					plan.push({ view, action: 'upload' });
+					break;
+				case 'only_on_server':
+					plan.push({ view, action: 'download' });
+					break;
+				case 'modified_after_server_delete':
+					plan.push({ view, action: 'upload' });
+					break;
+				case 'modified_after_client_delete':
+					plan.push({ view, action: 'download' });
+					break;
+				case 'deleted_on_server':
+					if (
+						conflict.client?.status === 'active'
+						&& conflict.client.mtime > (conflict.server?.deletedAt ?? 0)
+					) {
+						plan.push({ view, action: 'upload' });
+					} else {
+						deletionCandidates.push(view);
+					}
+					break;
+				case 'deleted_on_client':
+					if (
+						conflict.server?.status === 'active'
+						&& conflict.server.mtime > (conflict.client?.deletedAt ?? 0)
+					) {
+						plan.push({ view, action: 'download' });
+					} else {
+						deletionCandidates.push(view);
+					}
+					break;
+			}
+		}
+
+		for (const view of deletionCandidates) {
+			if (this.closed) {
+				return;
+			}
+			let decision: DeleteDecision = 'skip';
+			try {
+				decision = await confirmDeletionWithPreview(this.app, this.plugin, view.conflict);
+			} catch (error) {
+				new Notice(
+					t('Could not open the deletion preview: {error}', 'Не удалось открыть превью удаления: {error}', {
+						error: errorMessage(error),
+					}),
+					8000,
+				);
+				continue;
+			}
+			if (decision === 'delete') {
+				plan.push({ view, action: 'delete' });
+			} else if (decision === 'restore') {
+				plan.push({
+					view,
+					action: view.conflict.reason === 'deleted_on_client' ? 'download' : 'upload',
+				});
+			}
+		}
+
+		for (const view of this.contentViews) {
+			if (view.status !== 'pending') {
+				continue;
+			}
+			const clientTime = view.diff.client.mtime;
+			const serverTime = view.diff.server.mtime;
+			if (clientTime > serverTime) {
+				plan.push({ view, action: 'upload' });
+			} else if (serverTime > clientTime) {
+				plan.push({ view, action: 'download' });
+			}
+		}
+
+		if (plan.length === 0) {
+			new Notice(
+				t(
+					'Nothing to synchronize: the remaining files were skipped or have equal timestamps.',
+					'Нечего синхронизировать: оставшиеся файлы пропущены или имеют одинаковое время изменения.',
+				),
+			);
+			return;
+		}
+		await this.executePlan(plan);
+	}
+
+	private getParallelism(): number {
+		const value = this.plugin.settings.parallelTransfers;
+		if (!Number.isFinite(value)) {
+			return 4;
+		}
+		return Math.max(1, Math.min(6, Math.round(value)));
+	}
+
 	private decideConflict(conflict: FileConflict, mode: BulkMode): BulkAction | null {
 		const clientActive = conflict.client?.status === 'active';
 		const serverActive = conflict.server?.status === 'active';
@@ -905,22 +1037,30 @@ export class SyncReviewModal extends Modal {
 	}
 
 	private async executePlan(plan: Deal[]): Promise<void> {
+		if (plan.length === 0) {
+			return;
+		}
 		this.bulkRunning = true;
 		this.setBulkDisabled(true);
 		this.setActionButtonsDisabled(true);
 		if (this.closeButton) {
 			this.closeButton.disabled = true;
 		}
+		let processed = 0;
 		let completed = 0;
 		let failed = 0;
-		try {
-			for (let index = 0; index < plan.length; index += 1) {
-				if (this.closed) {
-					break;
+		let cursor = 0;
+		const parallelism = Math.min(this.getParallelism(), plan.length);
+		const worker = async (): Promise<void> => {
+			while (!this.closed) {
+				const index = cursor;
+				cursor += 1;
+				if (index >= plan.length) {
+					return;
 				}
 				const deal = plan[index];
-				this.showProgress(index + 1, plan.length);
 				if (!this.beginAction(deal.view)) {
+					processed += 1;
 					continue;
 				}
 				try {
@@ -939,7 +1079,13 @@ export class SyncReviewModal extends Modal {
 					failed += 1;
 					this.failAction(deal.view, error);
 				}
+				processed += 1;
+				this.showProgress(processed, plan.length);
 			}
+		};
+		try {
+			this.showProgress(0, plan.length);
+			await Promise.all(Array.from({ length: parallelism }, () => worker()));
 		} finally {
 			this.bulkRunning = false;
 			this.setBulkDisabled(false);

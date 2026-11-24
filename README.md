@@ -15,6 +15,12 @@ in an interactive review window.
 
 - **Bidirectional LAN sync.** New, changed and deleted files travel in both
   directions. The desktop runs an HTTP server; phones and other desktops are clients.
+- **One-tap both-way transfer.** “Send to both devices” uploads phone changes and
+  downloads desktop changes in one action, with both directions running in parallel.
+- **Deletion preview.** If a file was deleted on one side and still exists on the
+  other, the two-way action shows its text or image and asks to delete, restore or
+  skip it. Nothing is deleted silently.
+- **Parallel transfers.** 1–6 files can be transferred at once (configurable).
 - **Zero cloud dependency.** No third-party servers, no analytics, no telemetry.
   File contents only travel between paired devices on your network.
 - **Tombstone protection.** Deleting a file never silently removes its history from
@@ -117,6 +123,10 @@ The connection string looks like:
 - Per-file actions: send to desktop, download to phone, restore, delete everywhere,
   accept the desktop version, or skip. “Delete everywhere” respects the Obsidian
   trash preference (`FileManager.trashFile`) and records tombstones on both sides.
+- **Send to both devices** — one action for both directions. Uploads and downloads
+  run in parallel. A file changed on both sides keeps the newer version; a file
+  deleted on one side and still present on the other opens a preview with
+  **Delete / Restore / Skip**.
 - Bulk actions:
   - **Apply defaults to all** — preserves data: new files are copied, deleted files
     are offered for restore, newer versions win.
@@ -200,7 +210,7 @@ For every release:
 
 1. Run `npm run build`.
 2. Create a GitHub Release whose tag exactly matches `manifest.json` version
-   (for example `1.0.2`, without a `v` prefix).
+   (for example `1.1.0`, without a `v` prefix).
 3. Attach `main.js`, `manifest.json` and `styles.css` as release assets.
 4. Publish the release — it must not stay a draft or pre-release.
 

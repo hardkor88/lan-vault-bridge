@@ -352,6 +352,38 @@
 	font-weight: 500;
 }
 
+/* ---------- Кнопка «в обе стороны» ---------- */
+.lan-sync-two-way {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 10px 12px;
+	border: 1px solid var(--interactive-accent);
+	border-radius: var(--radius-m);
+	background: var(--background-secondary);
+}
+
+.lan-sync-two-way-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+}
+
+.lan-sync-two-way-icon {
+	display: inline-flex;
+}
+
+.lan-sync-delete-preview .lan-sync-preview {
+	margin: 8px 0;
+}
+
+.lan-sync-delete-buttons {
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+
 /* ---------- Футер ---------- */
 .lan-sync-footer {
 	position: sticky;

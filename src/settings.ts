@@ -276,6 +276,29 @@ export class LanSyncSettingTab extends PluginSettingTab {
 						},
 					},
 				},
+				{
+					name: t('Parallel transfers', 'Параллельные передачи'),
+					desc: t(
+						'How many files are transferred at once (1–6). Higher is faster but heavier on the network. Default: 4.',
+						'Сколько файлов передавать одновременно (1–6). Больше — быстрее, но выше нагрузка на сеть. По умолчанию: 4.',
+					),
+					control: {
+						type: 'number' as const,
+						key: 'parallelTransfers',
+						min: 1,
+						max: 6,
+						step: 1,
+						validate: (value: number) => {
+							if (!Number.isInteger(value) || value < 1 || value > 6) {
+								return t(
+									'Enter a whole number between 1 and 6.',
+									'Укажите целое число от 1 до 6.',
+								);
+							}
+							return undefined;
+						},
+					},
+				},
 			],
 		});
 
@@ -401,6 +424,14 @@ export class LanSyncSettingTab extends PluginSettingTab {
 					return;
 				}
 				settings.requestTimeoutMs = Math.round(seconds * 1000);
+				break;
+			}
+			case 'parallelTransfers': {
+				const parallel = Number(value);
+				if (!Number.isInteger(parallel) || parallel < 1 || parallel > 6) {
+					return;
+				}
+				settings.parallelTransfers = parallel;
 				break;
 			}
 			case 'debugLogging': {

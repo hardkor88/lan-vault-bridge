@@ -11,7 +11,7 @@ and push the contents of this folder:
 ```bash
 git init
 git add .
-git commit -m "Release 1.0.2"
+git commit -m "Release 1.1.0"
 git branch -M main
 git remote add origin https://github.com/hardkor88/lan-vault-bridge.git
 git push -u origin main
@@ -28,16 +28,16 @@ attached to the GitHub Release by the workflow.
 
 ## 2. Create the release
 
-The tag must exactly match `version` in `manifest.json` — `1.0.2`, without a `v`
+The tag must exactly match `version` in `manifest.json` — `1.1.0`, without a `v`
 prefix.
 
 ```bash
-git tag 1.0.2
-git push origin 1.0.2
+git tag 1.1.0
+git push origin 1.1.0
 ```
 
-If `1.0.0` or `1.0.1` is already published, commit the 1.0.2 changes, push them to
-`main`, then create the `1.0.2` tag. The review dashboard will pick up the new
+If an earlier version is already published, commit the 1.1.0 changes, push them to
+`main`, then create the `1.1.0` tag. The review dashboard will pick up the new
 release with the “Check for new releases” button.
 
 The workflow in `.github/workflows/release.yml` runs on the tag, verifies the tag
@@ -52,7 +52,7 @@ After the workflow finishes, open the release and confirm that it is **not** a
 draft and **not** a pre-release.
 
 You can also create the release manually: run `npm ci && npm run build`, then
-create a release for tag `1.0.2` and attach the three files above.
+create a release for tag `1.1.0` and attach the three files above.
 
 ## 3. Submit the plugin entry
 
@@ -85,7 +85,7 @@ create a release for tag `1.0.2` and attach the three files above.
 - [ ] `manifest.json` id is unique: `lan-vault-bridge` (checked against the directory).
 - [ ] Name does not contain “Obsidian”: “LAN Vault Bridge”.
 - [ ] Description is 250 characters or fewer, ends with a period and starts with a verb.
-- [ ] `version` is `1.0.2`; release tag is `1.0.2`.
+- [ ] `version` is `1.1.0`; release tag is `1.1.0`.
 - [ ] `minAppVersion` is justified: `1.13.0` (declarative settings).
 - [ ] `author` is a person/nickname, `authorUrl` points to GitHub.
 - [ ] `LICENSE` (MIT) exists in the repository root.
@@ -108,7 +108,7 @@ needs Node.
 ## 6. Automated review recommendations
 
 The review bot may show these as “Recommendation” (not failures). What was done in
-1.0.1/1.0.2:
+1.0.1/1.0.2/1.1.0:
 
 - **Local Storage** — removed. Automatic language detection now uses the
   Obsidian/moment locale and the browser language only.

@@ -336,6 +336,13 @@ export default class LanSyncPlugin extends Plugin implements SyncHost {
 		if (!Number.isFinite(this.settings.maxFileSizeMb)) {
 			this.settings.maxFileSizeMb = DEFAULT_SETTINGS.maxFileSizeMb;
 		}
+		if (
+			!Number.isInteger(this.settings.parallelTransfers)
+			|| this.settings.parallelTransfers < 1
+			|| this.settings.parallelTransfers > 6
+		) {
+			this.settings.parallelTransfers = DEFAULT_SETTINGS.parallelTransfers;
+		}
 		await this.saveSettings();
 	}
 

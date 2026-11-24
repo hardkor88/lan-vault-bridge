@@ -107,6 +107,8 @@ export interface LanSyncSettings {
 	clientToken: string;
 	requestTimeoutMs: number;
 	maxFileSizeMb: number;
+	/** Number of file transfers performed in parallel (1–6). */
+	parallelTransfers: number;
 	excludedFolders: string[];
 }
 
@@ -123,6 +125,7 @@ export const DEFAULT_SETTINGS: LanSyncSettings = {
 	clientToken: '',
 	requestTimeoutMs: 20000,
 	maxFileSizeMb: 50,
+	parallelTransfers: 4,
 	excludedFolders: [],
 };
 

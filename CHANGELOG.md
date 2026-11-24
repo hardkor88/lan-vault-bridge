@@ -2,6 +2,23 @@
 
 All notable changes to LAN Vault Bridge are documented in this file.
 
+## 1.1.0 — 2026-11-24
+
+### Added
+
+- **“Send to both devices”** button in the conflict review window: uploads phone
+  changes and downloads desktop changes in one action, with both directions running
+  at the same time.
+- **Parallel transfers**: 1–6 files at once, configurable in settings (default 4).
+- **Deletion preview**: when a file was deleted on one side and still exists on the
+  other, the two-way action shows its text or image and asks whether to delete it,
+  restore it, or skip.
+- For files changed on both sides, the newer version wins automatically.
+
+### Changed
+
+- Existing bulk actions also use the configured parallelism.
+
 ## 1.0.2 — 2026-11-21
 
 ### Changed
